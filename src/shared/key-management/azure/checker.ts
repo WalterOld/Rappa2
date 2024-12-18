@@ -123,7 +123,7 @@ export class AzureOpenAIKeyChecker extends KeyCheckerBase<AzureOpenAIKey> {
       AzureOpenAIKeyChecker.getCredentialsFromKey(key);
     const url = POST_CHAT_COMPLETIONS(resourceName, deploymentId);
     const testRequest = {
-      max_tokens: 1,
+      max_completion_tokens: 1,
       stream: false,
       messages: [{ role: "user", content: "" }],
     };
@@ -159,7 +159,7 @@ export class AzureOpenAIKeyChecker extends KeyCheckerBase<AzureOpenAIKey> {
     // Try to send an oversized prompt. GPT-4 Turbo can handle this but regular
     // GPT-4 will return a Bad Request error.
     const contextText = {
-      max_tokens: 9000,
+      max_completion_tokens: 9000,
       stream: false,
       temperature: 0,
       seed: 0,
