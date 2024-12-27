@@ -21,7 +21,7 @@ export const OpenAIV1ChatCompletionSchema = z
     model: z.string().max(100),
     messages: z.array(
       z.object({
-        role: z.enum(["system", "user", "assistant", "tool", "function"]),
+        role: z.enum(["developer", "system", "user", "assistant", "tool", "function"]),
         content: z.union([z.string(), OpenAIV1ChatContentArraySchema]),
         name: z.string().optional(),
         tool_calls: z.array(z.any()).optional(),
@@ -78,6 +78,7 @@ export const OpenAIV1ChatCompletionSchema = z
     tool_choice: z.any().optional(),
     function_choice: z.any().optional(),
     response_format: z.any(),
+    reasoning_effort: z.enum(["low", "medium", "high"]).optional(),
   })
   // Tool usage must be enabled via config because we currently have no way to
   // track quota usage for them or enforce limits.

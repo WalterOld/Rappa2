@@ -82,7 +82,7 @@ function openAIMessagesToClaudeTextPrompt(messages: OpenAIChatMessage[]) {
         let role: string = m.role;
         if (role === "assistant") {
           role = "Assistant";
-        } else if (role === "system") {
+        } else if (["system", "developer"].includes(role)) {
           role = "System";
         } else if (role === "user") {
           role = "Human";
@@ -365,7 +365,7 @@ function openAIMessagesToClaudeChatPrompt(messages: OpenAIChatMessage[]): {
     // Here we will lose the original name if it was a system message, but that
     // is generally okay because the system message is usually a prompt and not
     // a character in the chat.
-    const name = msg.role === "system" ? "System" : msg.name?.trim();
+    const name = ["system", "developer"].includes(msg.role) ? "System" : msg.name?.trim();
     const content = convertOpenAIContent(msg.content);
 
     // Prepend the display name to the first text content in the current message
@@ -395,8 +395,8 @@ function openAIMessagesToClaudeChatPrompt(messages: OpenAIChatMessage[]): {
 
 function isSystemOpenAIRole(
   role: OpenAIChatMessage["role"]
-): role is "system" | "function" | "tool" {
-  return ["system", "function", "tool"].includes(role);
+): role is "developer" | "system" | "function" | "tool" {
+  return ["developer","system", "function", "tool"].includes(role);
 }
 
 function getFirstTextContent(content: OpenAIChatMessage["content"]) {
