@@ -154,7 +154,7 @@ export const OPENAI_MODEL_FAMILY_MAP: { [regex: string]: OpenAIModelFamily } = {
   "^text-embedding-ada-002$": "turbo",
   "^dall-e-\\d{1}$": "dall-e",
   "^o1-mini(-\\d{4}-\\d{2}-\\d{2})?$": "o1-mini",
-  "^o1(-preview)?(-\\d{4}-\\d{2}-\\d{2})?$": "o1",
+  "^o1(-\\d{4}-\\d{2}-\\d{2})?$": "o1",
 };
 
 export function getOpenAIModelFamily(
