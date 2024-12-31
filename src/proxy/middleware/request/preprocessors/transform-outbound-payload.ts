@@ -89,25 +89,25 @@ function applyMistralPromptFixes(req: Request): void {
   }
 }
 
-function toSnakeCase(str: string): string {
-  return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+function toCamelCase(str: string): string {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
 }
 
-function transformKeysToSnakeCase(obj: any, hasTransformed = { value: false }): any {
+function transformKeysToCamelCase(obj: any, hasTransformed = { value: false }): any {
   if (Array.isArray(obj)) {
-    return obj.map(item => transformKeysToSnakeCase(item, hasTransformed));
+    return obj.map(item => transformKeysToCamelCase(item, hasTransformed));
   }
   
   if (obj !== null && typeof obj === 'object') {
     return Object.fromEntries(
       Object.entries(obj).map(([key, value]) => {
-        const snakeKey = toSnakeCase(key);
-        if (snakeKey !== key) {
+        const camelKey = toCamelCase(key);
+        if (camelKey !== key) {
           hasTransformed.value = true;
         }
         return [
-          snakeKey,
-          transformKeysToSnakeCase(value, hasTransformed)
+          camelKey,
+          transformKeysToCamelCase(value, hasTransformed)
         ];
       })
     );
@@ -118,11 +118,11 @@ function transformKeysToSnakeCase(obj: any, hasTransformed = { value: false }): 
 
 function applyGoogleAIKeyTransforms(req: Request): void {
   // Google (Gemini) API in their infinite wisdom accepts both snake_case and camelCase
-  // even though in the docs they use snake_case. Some frontends (e.g. ST) use camelCase
-  // so we normalize all keys to snake_case here
+  // for some params even though in the docs they use snake_case.
+  // Some frontends (e.g. ST) use snake_case and camelCase so we normalize all keys to camelCase
   if (req.outboundApi === "google-ai") {
     const hasTransformed = { value: false };
-    req.body = transformKeysToSnakeCase(req.body, hasTransformed);
+    req.body = transformKeysToCamelCase(req.body, hasTransformed);
     if (hasTransformed.value) {
       req.log.info("Applied Gemini camelCase -> snake_case transform");
     }

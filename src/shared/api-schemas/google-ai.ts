@@ -7,8 +7,8 @@ import { APIFormatTransformer } from "./index";
 
 const TextPartSchema = z.object({ text: z.string() });
 const InlineDataPartSchema = z.object({
-  inline_data: z.object({
-    mime_type: z.string(),
+  inlineData: z.object({
+    mimeType: z.string(),
     data: z.string(),
   }),
 });
@@ -169,6 +169,6 @@ export const transformOpenAIToGoogleAI: APIFormatTransformer<
 export function containsImageContent(contents: GoogleAIChatMessage[]): boolean {
   return contents.some(content => {
     const parts = Array.isArray(content.parts) ? content.parts : [content.parts];
-    return parts.some(part => 'inline_data' in part);
+    return parts.some(part => 'inlineData' in part);
   });
 }
