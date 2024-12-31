@@ -77,7 +77,7 @@ async function enqueue(req: Request) {
   }
 
   const enqueuedRequestCount = queue.filter(sharesIdentifierWith(req)).length;
-
+  // Do not apply concurrency limit to "special" users
   if (enqueuedRequestCount >= USER_CONCURRENCY_LIMIT && req.user?.type !== "special") {
     throw new TooManyRequestsError(
       "Your IP or user token already has another request in the queue."
