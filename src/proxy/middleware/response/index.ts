@@ -77,6 +77,7 @@ export const createOnProxyResHandler = (apiMiddleware: ProxyResMiddleware) => {
     if (req.changeManager) {
       req.changeManager.revert();
     }
+
     const initialHandler = req.isStreaming
       ? handleStreamedResponse
       : handleBlockingResponse;
