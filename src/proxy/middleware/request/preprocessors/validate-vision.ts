@@ -3,6 +3,7 @@ import { assertNever } from "../../../../shared/utils";
 import { RequestPreprocessor } from "../index";
 import { containsImageContent as containsImageContentOpenAI } from "../../../../shared/api-schemas/openai";
 import { containsImageContent as containsImageContentAnthropic } from "../../../../shared/api-schemas/anthropic";
+import { containsImageContent as containsImageContentGoogleAI } from "../../../../shared/api-schemas/google-ai";
 import { ForbiddenError } from "../../../../shared/errors";
 
 /**
@@ -25,8 +26,10 @@ export const validateVision: RequestPreprocessor = async (req) => {
     case "anthropic-chat":
       hasImage = containsImageContentAnthropic(req.body.messages);
       break;
-    case "anthropic-text":
     case "google-ai":
+      hasImage = containsImageContentGoogleAI(req.body.contents);
+      break;
+    case "anthropic-text":
     case "mistral-ai":
     case "mistral-text":
     case "openai-image":

@@ -165,3 +165,10 @@ export const transformOpenAIToGoogleAI: APIFormatTransformer<
     ],
   };
 };
+
+export function containsImageContent(contents: GoogleAIChatMessage[]): boolean {
+  return contents.some(content => {
+    const parts = Array.isArray(content.parts) ? content.parts : [content.parts];
+    return parts.some(part => 'inline_data' in part);
+  });
+}
