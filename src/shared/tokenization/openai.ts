@@ -45,7 +45,7 @@ export async function getTokenCount(
         const value = message[key as keyof OpenAIChatMessage];
 
         if (!value) continue;
-
+        if (key === 'function_call') continue;
         if (Array.isArray(value)) {
           for (const item of value) {
             if (item.type === "text") {
@@ -57,7 +57,7 @@ export async function getTokenCount(
             }
           }
         } else {
-          textContent = value;
+          textContent = value as string;
         }
 
         if (textContent.length > 800000 || numTokens > 200000) {
@@ -233,7 +233,7 @@ export function estimateGoogleAITokenCount(
   let numTokens = 0;
   for (const message of prompt) {
     numTokens += tokensPerMessage;
-    numTokens += encoder.encode(message.parts[0].text).length;
+    numTokens += encoder.encode((message.parts.filter(p => 'text' in p)[0] as { text: string }).text).length;
   }
 
   numTokens += 3;

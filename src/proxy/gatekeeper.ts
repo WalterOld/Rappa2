@@ -25,6 +25,12 @@ function getProxyAuthorizationFromRequest(req: Request): string | undefined {
     delete req.headers["x-api-key"];
     return token;
   }
+
+  if (req.headers["x-goog-api-key"]) {
+    const token = req.headers["x-goog-api-key"]?.toString();
+    delete req.headers["x-goog-api-key"];
+    return token;
+  }
   
   if (req.query.key) {
     const token = req.query.key?.toString();

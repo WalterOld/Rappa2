@@ -43,6 +43,7 @@ export class GcpKeyChecker extends KeyCheckerBase<GcpKey> {
         this.invokeModel("claude-3-sonnet@20240229", key, true),
         this.invokeModel("claude-3-opus@20240229", key, true),
         this.invokeModel("claude-3-5-sonnet@20240620", key, true),
+        this.invokeModel("claude-3-5-sonnet-v2@20241022", key, true),
       ];
 
       const [sonnet, haiku, opus, sonnet35] = await Promise.all(checks);
@@ -78,6 +79,7 @@ export class GcpKeyChecker extends KeyCheckerBase<GcpKey> {
         await this.invokeModel("claude-3-sonnet@20240229", key, false);
       } else if (key.sonnet35Enabled) {
         await this.invokeModel("claude-3-5-sonnet@20240620", key, false);
+        await this.invokeModel("claude-3-5-sonnet-v2@20241022", key, false);
       } else {
         await this.invokeModel("claude-3-opus@20240229", key, false);
       }

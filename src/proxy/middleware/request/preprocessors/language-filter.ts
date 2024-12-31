@@ -84,8 +84,8 @@ function getPromptFromRequest(req: Request) {
     case "google-ai": {
       const b = body as z.infer<typeof GoogleAIV1GenerateContentSchema>;
       return [
-        b.systemInstruction?.parts.map((p) => p.text),
-        ...b.contents.flatMap((c) => c.parts.map((p) => p.text)),
+        b.systemInstruction?.parts.filter(p => 'text' in p).map((p) => (p as { text: string }).text),
+        ...b.contents.flatMap((c) => c.parts.filter(p => 'text' in p).map((p) => (p as { text: string }).text)),
       ].join("\n");
     }
     default:

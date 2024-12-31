@@ -10,6 +10,7 @@ import { googleAI } from "./google-ai";
 import { mistralAI } from "./mistral-ai";
 import { openai } from "./openai";
 import { openaiImage } from "./openai-image";
+import { deepseek } from "./deepseek";
 import { sendErrorToClient } from "./middleware/response/error-generator";
 
 const proxyRouter = express.Router();
@@ -49,6 +50,7 @@ proxyRouter.use("/mistral-ai", addV1, mistralAI);
 proxyRouter.use("/aws", aws);
 proxyRouter.use("/gcp/claude", addV1, gcp);
 proxyRouter.use("/azure/openai", addV1, azure);
+proxyRouter.use("/deepseek", addV1, deepseek);
 
 // Redirect browser requests to the homepage.
 proxyRouter.get("*", (req, res, next) => {

@@ -68,9 +68,11 @@ export const validateContextSize: RequestPreprocessor = async (req) => {
     modelMax = 131072;
   } else if (model.match(/^gpt-4(-\d{4})?-vision(-preview)?$/)) {
     modelMax = 131072;
+  } else if (model.match(/^o1(-\d{4}-\d{2}-\d{2})?$/)) {
+    modelMax = 200000;
   } else if (model.match(/^o1-mini(-\d{4}-\d{2}-\d{2})?$/)) {
     modelMax = 128000;
-  } else if (model.match(/^o1(-preview)?(-\d{4}-\d{2}-\d{2})?$/)) {
+  } else if (model.match(/^o1-preview(-\d{4}-\d{2}-\d{2})?$/)) {
     modelMax = 128000;
   } else if (model.match(/gpt-3.5-turbo/)) {
     modelMax = 16384;
@@ -96,6 +98,8 @@ export const validateContextSize: RequestPreprocessor = async (req) => {
     modelMax = 200000;
   } else if (model.match(/^anthropic\.claude/)) {
     modelMax = 100000;
+  } else if (model.match(/^deepseek/)) {
+      modelMax = 64000;
   } else if (model.match(/tral/)) {
     // catches mistral, mixtral, codestral, mathstral, etc. mistral models have
     // no name convention and wildly different context windows so this is a

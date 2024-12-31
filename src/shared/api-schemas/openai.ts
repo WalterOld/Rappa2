@@ -21,11 +21,11 @@ export const OpenAIV1ChatCompletionSchema = z
     model: z.string().max(100),
     messages: z.array(
       z.object({
-        role: z.enum(["system", "user", "assistant", "tool", "function"]),
+        role: z.enum(["system", "developer", "user", "assistant", "tool", "function"]),
         content: z.union([z.string(), OpenAIV1ChatContentArraySchema]),
         name: z.string().optional(),
         tool_calls: z.array(z.any()).optional(),
-        function_call: z.array(z.any()).optional(),
+        function_call: z.any().optional(),
         tool_call_id: z.string().optional(),
       }),
       {
@@ -77,6 +77,7 @@ export const OpenAIV1ChatCompletionSchema = z
     functions: z.array(z.any()).optional(),
     tool_choice: z.any().optional(),
     function_choice: z.any().optional(),
+    reasoning_effort: z.enum(["low", "medium", "high"]).optional(),
     response_format: z.any(),
   })
   // Tool usage must be enabled via config because we currently have no way to

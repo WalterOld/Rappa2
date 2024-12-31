@@ -120,7 +120,7 @@ const flattenMessages = (
   if (isGoogleAIChatPrompt(val)) {
     return val.contents
       .map(({ parts, role }) => {
-        const text = parts.map((p) => p.text).join("\n");
+        const text = parts.filter(p => 'text' in p).map((p) => (p as { text: string }).text).join("\n");
         return `${role}: ${text}`;
       })
       .join("\n");

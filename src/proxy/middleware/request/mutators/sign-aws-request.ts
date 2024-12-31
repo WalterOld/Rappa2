@@ -27,6 +27,14 @@ export const signAwsRequest: ProxyReqMutator = async (manager) => {
   const key = keyPool.get(model, "aws") as AwsBedrockKey;
   manager.setKey(key);
 
+  let system = req.body.system ?? "";
+  if (Array.isArray(system)) {
+    system = system
+      .map((m: { type: string; text: string }) => m.text)
+      .join("\n");
+    req.body.system = system;
+  }
+
   const credential = getCredentialParts(req);
   const host = AMZ_HOST.replace("%REGION%", credential.region);
 
@@ -130,6 +138,8 @@ function getStrictlyValidatedBodyForAws(req: Readonly<Request>): unknown {
         temperature: true,
         top_k: true,
         top_p: true,
+        tools: true,
+        tool_choice: true
       })
         .strip()
         .parse(req.body);

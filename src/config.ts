@@ -34,6 +34,10 @@ type Config = {
    */
   mistralAIKey?: string;
   /**
+   * Comma-delimited list of Deepseek API keys.
+   */
+  deepseekKey?: string;
+  /**
    * Comma-delimited list of AWS credentials. Each credential item should be a
    * colon-delimited list of access key, secret key, and AWS region.
    *
@@ -426,6 +430,7 @@ export const config: Config = {
   anthropicKey: getEnvWithDefault("ANTHROPIC_KEY", ""),
   googleAIKey: getEnvWithDefault("GOOGLE_AI_KEY", ""),
   mistralAIKey: getEnvWithDefault("MISTRAL_AI_KEY", ""),
+  deepseekKey: getEnvWithDefault("DEEPSEEK_KEY", ""),
   awsCredentials: getEnvWithDefault("AWS_CREDENTIALS", ""),
   gcpCredentials: getEnvWithDefault("GCP_CREDENTIALS", ""),
   azureCredentials: getEnvWithDefault("AZURE_CREDENTIALS", ""),
@@ -541,6 +546,7 @@ function generateSigningKey() {
     config.anthropicKey,
     config.googleAIKey,
     config.mistralAIKey,
+    config.deepseekKey,
     config.awsCredentials,
     config.gcpCredentials,
     config.azureCredentials,
@@ -689,6 +695,7 @@ export const OMITTED_KEYS = [
   "openaiKey",
   "anthropicKey",
   "googleAIKey",
+  "deepseekKey",
   "mistralAIKey",
   "awsCredentials",
   "gcpCredentials",

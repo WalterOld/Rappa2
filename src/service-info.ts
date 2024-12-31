@@ -19,6 +19,7 @@ import {
   MODEL_FAMILY_SERVICE,
   ModelFamily,
   OpenAIModelFamily,
+  DeepseekModelFamily,
 } from "./shared/models";
 import { getCostSuffix, getTokenCostUsd, prettyTokens } from "./shared/stats";
 import { getUniqueIps } from "./proxy/rate-limit";
@@ -96,6 +97,7 @@ export type ServiceInfo = {
   uptime: number;
   endpoints: {
     openai?: string;
+    deepseek?: string;
     anthropic?: string;
     "google-ai"?: string;
     "mistral-ai"?: string;
@@ -117,7 +119,8 @@ export type ServiceInfo = {
   & { [f in GcpModelFamily]?: GcpInfo }
   & { [f in AzureOpenAIModelFamily]?: BaseFamilyInfo; }
   & { [f in GoogleAIModelFamily]?: BaseFamilyInfo }
-  & { [f in MistralAIModelFamily]?: BaseFamilyInfo };
+  & { [f in MistralAIModelFamily]?: BaseFamilyInfo }
+  & { [f in DeepseekModelFamily]?: BaseFamilyInfo };
 
 // https://stackoverflow.com/a/66661477
 // type DeepKeyOf<T> = (
@@ -158,6 +161,9 @@ const SERVICE_ENDPOINTS: { [s in LLMService]: Record<string, string> } = {
   azure: {
     azure: `%BASE%/azure/openai`,
     "azure-image": `%BASE%/azure/openai`,
+  },
+  deepseek: {
+    deepseek: `%BASE%/deepseek`,
   },
 };
 
@@ -309,6 +315,7 @@ function addKeyToAggregates(k: KeyPoolKey) {
   addToService("aws__keys", k.service === "aws" ? 1 : 0);
   addToService("gcp__keys", k.service === "gcp" ? 1 : 0);
   addToService("azure__keys", k.service === "azure" ? 1 : 0);
+  addToService("deepseek__keys", k.service === "deepseek" ? 1 : 0);
 
   let sumTokens = 0;
   let sumCost = 0;
@@ -376,6 +383,7 @@ function addKeyToAggregates(k: KeyPoolKey) {
     case "azure":
     case "google-ai":
     case "mistral-ai":
+    case "deepseek":
       k.modelFamilies.forEach(incrementGenericFamilyStats);
       break;
     default:

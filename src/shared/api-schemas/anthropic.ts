@@ -19,6 +19,8 @@ const AnthropicV1BaseSchema = z
     top_k: z.coerce.number().optional(),
     top_p: z.coerce.number().optional(),
     metadata: z.object({ user_id: z.string().optional() }).optional(),
+    tools: z.array(z.any()).optional(),
+    tool_choice: z.any().optional(),
   })
   .strip();
 
@@ -43,6 +45,18 @@ const AnthropicV1MessageMultimodalContentSchema = z.array(
         media_type: z.string().max(100),
         data: z.string(),
       }),
+    }),
+    z.object({
+      type: z.literal("tool_use"),
+      id: z.string(),
+      name: z.string(),
+      input: z.object({}).passthrough(),
+    }),
+    z.object({
+      type: z.literal("tool_result"),
+      tool_use_id: z.string(),
+      is_error: z.boolean().optional(),
+      content: z.union([z.string(), z.object({}).passthrough()]).optional(),
     }),
   ])
 );
@@ -82,7 +96,7 @@ function openAIMessagesToClaudeTextPrompt(messages: OpenAIChatMessage[]) {
         let role: string = m.role;
         if (role === "assistant") {
           role = "Assistant";
-        } else if (role === "system") {
+        } else if (role === "system" || role === "developer") {
           role = "System";
         } else if (role === "user") {
           role = "Human";
@@ -109,6 +123,10 @@ export const transformOpenAIToAnthropicChat: APIFormatTransformer<
     );
     throw result.error;
   }
+  if (result.data.max_tokens > 8192) {
+    result.data.max_tokens = 4096;
+  }
+    
 
   const { messages, ...rest } = result.data;
   const { messages: newMessages, system } =
@@ -365,7 +383,7 @@ function openAIMessagesToClaudeChatPrompt(messages: OpenAIChatMessage[]): {
     // Here we will lose the original name if it was a system message, but that
     // is generally okay because the system message is usually a prompt and not
     // a character in the chat.
-    const name = msg.role === "system" ? "System" : msg.name?.trim();
+    const name = (msg.role === "system" || msg.role === "developer") ? "System" : msg.name?.trim();
     const content = convertOpenAIContent(msg.content);
 
     // Prepend the display name to the first text content in the current message
@@ -395,8 +413,8 @@ function openAIMessagesToClaudeChatPrompt(messages: OpenAIChatMessage[]): {
 
 function isSystemOpenAIRole(
   role: OpenAIChatMessage["role"]
-): role is "system" | "function" | "tool" {
-  return ["system", "function", "tool"].includes(role);
+): role is "developer" | "system" | "function" | "tool" {
+  return ["developer", "system", "function", "tool"].includes(role);
 }
 
 function getFirstTextContent(content: OpenAIChatMessage["content"]) {

@@ -14,7 +14,8 @@ export type LLMService =
   | "mistral-ai"
   | "aws"
   | "gcp"
-  | "azure";
+  | "azure"
+  | "deepseek";
 
 export type OpenAIModelFamily =
   | "turbo"
@@ -39,6 +40,8 @@ export type AwsBedrockModelFamily = `aws-${
   | MistralAIModelFamily}`;
 export type GcpModelFamily = "gcp-claude" | "gcp-claude-opus";
 export type AzureOpenAIModelFamily = `azure-${OpenAIModelFamily}`;
+export type DeepseekModelFamily = "deepseek";
+
 export type ModelFamily =
   | OpenAIModelFamily
   | AnthropicModelFamily
@@ -46,11 +49,13 @@ export type ModelFamily =
   | MistralAIModelFamily
   | AwsBedrockModelFamily
   | GcpModelFamily
-  | AzureOpenAIModelFamily;
+  | AzureOpenAIModelFamily
+  | DeepseekModelFamily;
 
 export const MODEL_FAMILIES = (<A extends readonly ModelFamily[]>(
   arr: A & ([ModelFamily] extends [A[number]] ? unknown : never)
 ) => arr)([
+  "deepseek",
   "turbo",
   "gpt4",
   "gpt4-32k",
@@ -96,11 +101,13 @@ export const LLM_SERVICES = (<A extends readonly LLMService[]>(
   "aws",
   "gcp",
   "azure",
+  "deepseek",
 ] as const);
 
 export const MODEL_FAMILY_SERVICE: {
   [f in ModelFamily]: LLMService;
 } = {
+  deepseek: "deepseek",
   turbo: "openai",
   gpt4: "openai",
   "gpt4-turbo": "openai",
@@ -154,7 +161,7 @@ export const OPENAI_MODEL_FAMILY_MAP: { [regex: string]: OpenAIModelFamily } = {
   "^text-embedding-ada-002$": "turbo",
   "^dall-e-\\d{1}$": "dall-e",
   "^o1-mini(-\\d{4}-\\d{2}-\\d{2})?$": "o1-mini",
-  "^o1(-preview)?(-\\d{4}-\\d{2}-\\d{2})?$": "o1",
+  "^o1(-\\d{4}-\\d{2}-\\d{2})?$": "o1",
 };
 
 export function getOpenAIModelFamily(
@@ -272,7 +279,11 @@ export function getModelFamilyForRequest(req: Request): ModelFamily {
       case "openai":
       case "openai-text":
       case "openai-image":
-        modelFamily = getOpenAIModelFamily(model);
+        if (req.service === "deepseek") {
+          modelFamily = "deepseek";
+        } else {
+          modelFamily = getOpenAIModelFamily(model);
+        }
         break;
       case "google-ai":
         modelFamily = getGoogleAIModelFamily(model);

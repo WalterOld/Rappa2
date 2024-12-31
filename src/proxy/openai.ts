@@ -109,6 +109,15 @@ const openaiResponseHandler: ProxyResHandlerWithBody = async (
     throw new Error("Expected body to be an object");
   }
 
+  const interval = (req as any)._keepAliveInterval
+  if (interval) {
+    clearInterval(interval);
+    const responseJson = JSON.stringify(body);
+    res.write(responseJson.substring(1));
+    res.end();
+    return;
+  }
+
   let newBody = body;
   if (req.outboundApi === "openai-text" && req.inboundApi === "openai") {
     req.log.info("Transforming Turbo-Instruct response to Chat format");
@@ -172,14 +181,38 @@ openaiRouter.post(
   ),
   openaiProxy
 );
-// General chat completion endpoint. Turbo-instruct is not supported here.
+
+const setupChunkedTransfer: RequestHandler = (req, res, next) => {
+  req.log.info("Setting chunked transfer for o1 to prevent Cloudflare timeouts")
+  if (isO1Model(req.body.model)) {
+    req.isChunkedTransfer = true;
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Transfer-Encoding': 'chunked'
+    });
+    
+    res.write('{');
+    
+    // Higher values are required - otherwise Cloudflare will buffer and not pass
+    // the separate chunks, which means that a >100s response will get terminated anyway
+    const keepAlive = setInterval(() => {
+      res.write(' '.repeat(512));
+    }, 5_000);
+    
+    (req as any)._keepAliveInterval = keepAlive;
+  }
+  next();
+};
+
+
 openaiRouter.post(
   "/v1/chat/completions",
   ipLimiter,
   createPreprocessorMiddleware(
     { inApi: "openai", outApi: "openai", service: "openai" },
-    { afterTransform: [fixupMaxTokens] }
+    { afterTransform: [fixupMaxTokens, setO1ReasoningEffort] }
   ),
+  setupChunkedTransfer,
   openaiProxy
 );
 // Embeddings endpoint.
@@ -199,6 +232,19 @@ function fixupMaxTokens(req: Request) {
     req.body.max_completion_tokens = req.body.max_tokens;
   }
   delete req.body.max_tokens;
+}
+
+function isO1Model(model: string): boolean {
+  return model === 'o1' || model.includes('o1-');
+}
+
+function setO1ReasoningEffort(req: Request) {
+  if (!isO1Model(req.body.model)) return;
+  
+  if (!req.body.reasoning_effort) {
+    req.log.info("Setting reasoning effort to high for o1 request");
+    req.body.reasoning_effort = 'high';
+  }
 }
 
 export const openai = openaiRouter;

@@ -13,6 +13,7 @@ import { AwsBedrockKeyProvider } from "./aws/provider";
 import { GcpKeyProvider, GcpKey } from "./gcp/provider";
 import { AzureOpenAIKeyProvider } from "./azure/provider";
 import { MistralAIKeyProvider } from "./mistral-ai/provider";
+import { DeepseekKeyProvider } from "./deepseek/provider";
 
 type AllowedPartial = OpenAIKeyUpdate | AnthropicKeyUpdate | Partial<GcpKey>;
 
@@ -30,6 +31,7 @@ export class KeyPool {
     this.keyProviders.push(new AwsBedrockKeyProvider());
     this.keyProviders.push(new GcpKeyProvider());
     this.keyProviders.push(new AzureOpenAIKeyProvider());
+    this.keyProviders.push(new DeepseekKeyProvider());
   }
 
   public init() {
@@ -129,7 +131,9 @@ export class KeyPool {
   }
 
   private getServiceForModel(model: string): LLMService {
-    if (
+    if (model.startsWith("deepseek")) {
+      return "deepseek";
+    } else if (
       model.startsWith("gpt") ||
       model.startsWith("text-embedding-ada") ||
       model.startsWith("dall-e")

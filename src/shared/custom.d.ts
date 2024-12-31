@@ -33,6 +33,7 @@ declare global {
       tokenizerInfo: Record<string, any>;
       signedRequest: HttpRequest;
       modelFamily?: ModelFamily;
+      isChunkedTransfer?: boolean;
     }
   }
 }

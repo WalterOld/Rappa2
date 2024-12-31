@@ -88,6 +88,9 @@ export const addKey: ProxyReqMutator = (manager) => {
       const azureKey = assignedKey.key;
       manager.setHeader("api-key", azureKey);
       break;
+    case "deepseek":
+      manager.setHeader("Authorization", `Bearer ${assignedKey.key}`);
+      break;
     case "aws":
     case "gcp":
     case "google-ai":
