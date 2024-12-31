@@ -238,13 +238,16 @@ function isO1Model(model: string): boolean {
   return model === 'o1' || model.includes('o1-');
 }
 
+// most frontends don't currently support custom reasoning effort for o1
+// so we do this to overwrite the default (medium)
 function setO1ReasoningEffort(req: Request) {
-  if (!isO1Model(req.body.model)) return;
+  const effort = process.env.O1_REASONING_EFFORT?.toLowerCase();
+  if (!effort || !isO1Model(req.body.model) || req.body.reasoning_effort) return;
   
-  if (!req.body.reasoning_effort) {
-    req.log.info("Setting reasoning effort to high for o1 request");
-    req.body.reasoning_effort = 'high';
+  if (['low', 'medium', 'high'].includes(effort)) {
+    req.body.reasoning_effort = effort;
   }
 }
+
 
 export const openai = openaiRouter;
