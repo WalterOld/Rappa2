@@ -196,15 +196,15 @@ const setupChunkedTransfer: RequestHandler = (req, res, next) => {
     // Higher values are required - otherwise Cloudflare will buffer and not pass
     // the separate chunks, which means that a >100s response will get terminated anyway
     const keepAlive = setInterval(() => {
-      res.write(' '.repeat(512));
-    }, 5_000);
+      res.write(' '.repeat(4096));
+    }, 49_000);
     
     (req as any)._keepAliveInterval = keepAlive;
   }
   next();
 };
 
-
+// General chat completion endpoint. Turbo-instruct is not supported here.
 openaiRouter.post(
   "/v1/chat/completions",
   ipLimiter,
