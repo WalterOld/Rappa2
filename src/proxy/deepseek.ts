@@ -1,4 +1,4 @@
-import { Request, Router } from "express";
+import { Request, RequestHandler, Router } from "express";
 import { createPreprocessorMiddleware } from "./middleware/request";
 import { ipLimiter } from "./rate-limit";
 import { createQueuedProxyMiddleware } from "./middleware/request/proxy-middleware-factory";
@@ -18,6 +18,10 @@ const deepseekResponseHandler: ProxyResHandlerWithBody = async (
   let newBody = body;
 
   res.status(200).json({ ...newBody, proxy: body.proxy });
+};
+
+const handleModelRequest: RequestHandler = (_req, res) => {
+  res.status(200).json({"object":"list","data":[{"id":"deepseek-chat","object":"model","owned_by":"deepseek"}]});
 };
 
 const deepseekProxy = createQueuedProxyMiddleware({
@@ -58,5 +62,7 @@ deepseekRouter.post(
   ),
   deepseekProxy
 );
+
+deepseekRouter.get("/v1/models", handleModelRequest);
 
 export const deepseek = deepseekRouter;
