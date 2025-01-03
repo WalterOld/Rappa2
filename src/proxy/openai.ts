@@ -235,7 +235,7 @@ function fixupMaxTokens(req: Request) {
 }
 
 function isO1Model(model: string): boolean {
-  return model === 'o1' || model.includes('o1-');
+  return model === 'o1' || model === 'o1-2024-12-17';
 }
 
 // most frontends don't currently support custom reasoning effort for o1
