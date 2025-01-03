@@ -54,11 +54,18 @@ function handleModelsRequest(req: Request, res: Response) {
     .filter((id) => availableModelIds.has(id))
     .map((id) => {
       const vendor = id.match(/^(.*)\./)?.[1];
+      const date = new Date();
       return {
+        // Common
         id,
-        object: "model",
-        created: new Date().getTime(),
         owned_by: vendor,
+        // Anthropic
+        type: "model",
+        display_name: id.split('.')[1],
+        created_at: date.toISOString(),
+        // OpenAI
+        object: "model",
+        created: date.getTime(),
         permission: [],
         root: vendor,
         parent: null,
@@ -66,8 +73,13 @@ function handleModelsRequest(req: Request, res: Response) {
     });
 
   modelsCache[vendor] = {
+    // Common
     object: "list",
     data: models.filter((m) => vendor === "all" || m.root === vendor),
+    // Anthropic
+    has_more: false,
+    first_id: models[0]?.id,
+    last_id: models[models.length - 1]?.id,
   };
   modelsCacheTime[vendor] = new Date().getTime();
 
