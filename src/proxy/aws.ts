@@ -35,22 +35,24 @@ function handleModelsRequest(req: Request, res: Response) {
     (key as AwsBedrockKey).modelIds.forEach((id) => availableModelIds.add(id));
   }
 
+  const modelDisplayNames = new Map([
+    ["anthropic.claude-v2", "Claude 2"],
+    ["anthropic.claude-v2:1", "Claude 2.1"],
+    ["anthropic.claude-3-haiku-20240307-v1:0", "Claude 3 Haiku"],
+    ["anthropic.claude-3-5-haiku-20241022-v1:0", "Claude 3.5 Haiku"],
+    ["anthropic.claude-3-sonnet-20240229-v1:0", "Claude 3 Sonnet"],
+    ["anthropic.claude-3-5-sonnet-20240620-v1:0", "Claude 3.5 Sonnet (Old)"],
+    ["anthropic.claude-3-5-sonnet-20241022-v2:0", "Claude 3.5 Sonnet (New)"],
+    ["anthropic.claude-3-opus-20240229-v1:0", "Claude 3 Opus"],
+    ["mistral.mistral-7b-instruct-v0:2", "Mistral 7B Instruct"],
+    ["mistral.mixtral-8x7b-instruct-v0:1", "Mixtral 8x7B Instruct"],
+    ["mistral.mistral-large-2402-v1:0", "Mistral Large 2402"],
+    ["mistral.mistral-large-2407-v1:0", "Mistral Large 2407"],
+    ["mistral.mistral-small-2402-v1:0", "Mistral Small 2402"],
+  ]);
+
   // https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html
-  const models = [
-    "anthropic.claude-v2",
-    "anthropic.claude-v2:1",
-    "anthropic.claude-3-haiku-20240307-v1:0",
-    "anthropic.claude-3-5-haiku-20241022-v1:0",
-    "anthropic.claude-3-sonnet-20240229-v1:0",
-    "anthropic.claude-3-5-sonnet-20240620-v1:0",
-    "anthropic.claude-3-5-sonnet-20241022-v2:0",
-    "anthropic.claude-3-opus-20240229-v1:0",
-    "mistral.mistral-7b-instruct-v0:2",
-    "mistral.mixtral-8x7b-instruct-v0:1",
-    "mistral.mistral-large-2402-v1:0",
-    "mistral.mistral-large-2407-v1:0",
-    "mistral.mistral-small-2402-v1:0",
-  ]
+  const models = Array.from(modelDisplayNames.keys())
     .filter((id) => availableModelIds.has(id))
     .map((id) => {
       const vendor = id.match(/^(.*)\./)?.[1];
@@ -61,7 +63,7 @@ function handleModelsRequest(req: Request, res: Response) {
         owned_by: vendor,
         // Anthropic
         type: "model",
-        display_name: id.split('.')[1],
+        display_name: modelDisplayNames.get(id) || id.split('.')[1],
         created_at: date.toISOString(),
         // OpenAI
         object: "model",
