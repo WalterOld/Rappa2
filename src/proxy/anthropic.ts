@@ -18,45 +18,46 @@ const getModelsResponse = () => {
     return modelsCache;
   }
 
-  if (!config.anthropicKey) return { object: "list", data: [] };
+  if (!config.anthropicKey) return { object: "list", data: [], has_more: false, first_id: null, last_id: null };
 
   const claudeVariants = [
-    "claude-v1",
-    "claude-v1-100k",
-    "claude-instant-v1",
-    "claude-instant-v1-100k",
-    "claude-v1.3",
-    "claude-v1.3-100k",
-    "claude-v1.2",
-    "claude-v1.0",
-    "claude-instant-v1.1",
-    "claude-instant-v1.1-100k",
-    "claude-instant-v1.0",
-    "claude-2",
-    "claude-2.0",
-    "claude-2.1",
-    "claude-3-haiku-20240307",
-    "claude-3-5-haiku-20241022",
-    "claude-3-opus-20240229",
-    "claude-3-opus-latest",
-    "claude-3-sonnet-20240229",
-    "claude-3-5-sonnet-20240620",
-    "claude-3-5-sonnet-20241022",
-    "claude-3-5-sonnet-latest",
+    ["claude-2", "Claude 2"],
+    ["claude-2.0", "Claude 2.0"],
+    ["claude-2.1", "Claude 2.1"],
+    ["claude-3-haiku-20240307", "Claude 3 Haiku"],
+    ["claude-3-5-haiku-20241022", "Claude 3.5 Haiku"],
+    ["claude-3-opus-20240229", "Claude 3 Opus"],
+    ["claude-3-opus-latest", "Claude 3 Opus (latest)"],
+    ["claude-3-sonnet-20240229", "Claude 3 Sonnet"],
+    ["claude-3-5-sonnet-20240620", "Claude 3.5 Sonnet (Old)"],
+    ["claude-3-5-sonnet-20241022", "Claude 3.5 Sonnet (New)"],
+    ["claude-3-5-sonnet-latest", "Claude 3.5 Sonnet (Latest)"]
   ];
 
-  const models = claudeVariants.map((id) => ({
+  const date = new Date()
+  const models = claudeVariants.map(([id, display_name]) => ({
+    // Common
     id,
-    object: "model",
-    created: new Date().getTime(),
     owned_by: "anthropic",
-    permission: [],
-    root: "claude",
-    parent: null,
-  }));
+    // Anthropic
+    type: "model",
+    display_name,
+    created_at: date.toISOString(),
+    // OpenAI
+    object: "model",
+    created: date.getTime(),
+  }));  
 
-  modelsCache = { object: "list", data: models };
-  modelsCacheTime = new Date().getTime();
+  modelsCache = { 
+    // Common
+    object: "list",
+    data: models,
+    // Anthropic
+    has_more: false,
+    first_id: claudeVariants[0][0],
+    last_id: claudeVariants.at(-1)![0],
+  };
+  modelsCacheTime = date.getTime();
 
   return modelsCache;
 };
