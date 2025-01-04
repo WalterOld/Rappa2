@@ -32,7 +32,7 @@ export const addGoogleAIKey: ProxyReqMutator = (manager) => {
     method: "POST",
     protocol: "https:",
     hostname: "generativelanguage.googleapis.com",
-    path: `/v1beta/models/${model}:${
+    path: `/${req.params.apiVersion}/models/${model}:${
       req.isStreaming ? "streamGenerateContent?alt=sse&" : "generateContent?"
     }key=${key.key}`,
     headers: {

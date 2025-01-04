@@ -5,7 +5,11 @@ import {
 } from "./openai";
 import { APIFormatTransformer } from "./index";
 
-const TextPartSchema = z.object({ text: z.string() });
+const TextPartSchema = z.object({ 
+  text: z.string(),
+  thought: z.boolean().optional()
+});
+
 const InlineDataPartSchema = z.object({
   inlineData: z.object({
     mimeType: z.string(),

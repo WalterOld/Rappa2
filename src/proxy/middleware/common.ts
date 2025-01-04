@@ -16,7 +16,8 @@ const ANTHROPIC_COMPLETION_ENDPOINT = "/v1/complete";
 const ANTHROPIC_MESSAGES_ENDPOINT = "/v1/messages";
 const ANTHROPIC_SONNET_COMPAT_ENDPOINT = "/v1/sonnet";
 const ANTHROPIC_OPUS_COMPAT_ENDPOINT = "/v1/opus";
-const GOOGLE_AI_COMPLETION_ENDPOINT = "/v1beta/models";
+const GOOGLE_AI_ALPHA_COMPLETION_ENDPOINT = "/v1alpha/models";
+const GOOGLE_AI_BETA_COMPLETION_ENDPOINT = "/v1beta/models";
 
 export function isTextGenerationRequest(req: Request) {
   return (
@@ -28,7 +29,8 @@ export function isTextGenerationRequest(req: Request) {
       ANTHROPIC_MESSAGES_ENDPOINT,
       ANTHROPIC_SONNET_COMPAT_ENDPOINT,
       ANTHROPIC_OPUS_COMPAT_ENDPOINT,
-      GOOGLE_AI_COMPLETION_ENDPOINT,
+      GOOGLE_AI_ALPHA_COMPLETION_ENDPOINT,
+      GOOGLE_AI_BETA_COMPLETION_ENDPOINT,
     ].some((endpoint) => req.path.startsWith(endpoint))
   );
 }

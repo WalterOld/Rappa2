@@ -117,7 +117,7 @@ googleAIRouter.get("/v1/models", handleModelRequest);
 
 // Native Google AI chat completion endpoint
 googleAIRouter.post(
-  "/v1beta/models/:modelId:(generateContent|streamGenerateContent)",
+  "/:apiVersion(v1alpha|v1beta)/models/:modelId:(generateContent|streamGenerateContent)",
   ipLimiter,
   createPreprocessorMiddleware(
     { inApi: "google-ai", outApi: "google-ai", service: "google-ai" },
