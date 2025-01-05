@@ -25,6 +25,9 @@ export const addGoogleAIKey: ProxyReqMutator = (manager) => {
   // https://generativelanguage.googleapis.com/v1beta/models/$MODEL_ID:streamGenerateContent?key=${API_KEY}
   const payload = { ...req.body, stream: undefined, model: undefined };
 
+  // For OpenAI -> Google conversion we don't actually have the API version
+  const apiVersion = req.params.apiVersion || "v1beta"
+
   // TODO: this isn't actually signed, so the manager api is a little unclear
   // with the ProxyReqManager refactor, it's probably no longer necesasry to
   // do this because we can modify the path using Manager.setPath.
@@ -32,7 +35,7 @@ export const addGoogleAIKey: ProxyReqMutator = (manager) => {
     method: "POST",
     protocol: "https:",
     hostname: "generativelanguage.googleapis.com",
-    path: `/${req.params.apiVersion}/models/${model}:${
+    path: `/${apiVersion}/models/${model}:${
       req.isStreaming ? "streamGenerateContent?alt=sse&" : "generateContent?"
     }key=${key.key}`,
     headers: {
