@@ -10,14 +10,14 @@ const MIN_CHECK_INTERVAL = 3 * 1000; // 3 seconds
 const KEY_CHECK_PERIOD = 60 * 60 * 1000; // 1 hour
 const POST_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions";
 const GET_MODELS_URL = "https://api.openai.com/v1/models";
-const GET_ORGANIZATIONS_URL = "https://api.openai.com/v1/organizations";
+const GET_ORGANIZATIONS_URL = "https://api.openai.com/v1/me";
 
 type GetModelsResponse = {
   data: [{ id: string }];
 };
 
 type GetOrganizationsResponse = {
-  data: [{ id: string; is_default: boolean }];
+  orgs: {data: [{ id: string; is_default: boolean }]};
 };
 
 type OpenAIError = {
@@ -105,7 +105,7 @@ export class OpenAIKeyChecker extends KeyCheckerBase<OpenAIKey> {
         GET_ORGANIZATIONS_URL,
         opts
       );
-      const organizations = data.data;
+      const organizations = data.orgs.data;
       const defaultOrg = organizations.find(({ is_default }) => is_default);
       this.updateKey(key.hash, { organizationId: defaultOrg?.id });
       if (organizations.length <= 1) return;
@@ -288,7 +288,7 @@ export class OpenAIKeyChecker extends KeyCheckerBase<OpenAIKey> {
       payload,
       {
         headers: OpenAIKeyChecker.getHeaders(key),
-        validateStatus: (status) => status === 400,
+        validateStatus: (status) => status === 404,
       }
     );
     const rateLimitHeader = headers["x-ratelimit-limit-requests"];
@@ -298,7 +298,7 @@ export class OpenAIKeyChecker extends KeyCheckerBase<OpenAIKey> {
     if (data.error.type !== "invalid_request_error") {
       this.log.warn(
         { key: key.hash, error: data },
-        "Unexpected 400 error class while checking key; assuming key is valid, but this may indicate a change in the API."
+        "Unexpected 404 error class while checking key; assuming key is valid, but this may indicate a change in the API."
       );
     }
     return { rateLimit };
