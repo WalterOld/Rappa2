@@ -21,7 +21,13 @@ const deepseekResponseHandler: ProxyResHandlerWithBody = async (
 };
 
 const handleModelRequest: RequestHandler = (_req, res) => {
-  res.status(200).json({"object":"list","data":[{"id":"deepseek-chat","object":"model","owned_by":"deepseek"}]});
+  res.status(200).json({
+    object: "list",
+    data: [
+      { id: "deepseek-chat", object: "model", owned_by: "deepseek" },
+      { id: "deepseek-reasoner", object: "model", owned_by: "deepseek" },
+    ],
+  });
 };
 
 const deepseekProxy = createQueuedProxyMiddleware({
@@ -52,13 +58,24 @@ function enablePrefill(req: Request) {
   msgs.splice(i + 1, msgs.length, { role: 'assistant', content, prefix: true });
 }
 
+function removeReasonerStuff(req: Request) {
+  if (req.body.model === "deepseek-reasoner") {
+    // https://api-docs.deepseek.com/guides/reasoning_model
+    delete req.body.presence_penalty;
+    delete req.body.frequency_penalty;
+    delete req.body.temperature;
+    delete req.body.top_p;
+    delete req.body.logprobs;
+    delete req.body.top_logprobs;
+  }
+}
 
 deepseekRouter.post(
   "/v1/chat/completions",
   ipLimiter,
   createPreprocessorMiddleware(
     { inApi: "openai", outApi: "openai", service: "deepseek" },
-    { afterTransform: [ enablePrefill ] }
+    { afterTransform: [ enablePrefill, removeReasonerStuff ] }
   ),
   deepseekProxy
 );
