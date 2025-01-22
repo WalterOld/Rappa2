@@ -75,6 +75,7 @@ export const GoogleAIV1GenerateContentSchema = z
         topP: z.number().min(0).max(1).optional(),
         topK: z.number().min(1).max(40).optional(),
         stopSequences: z.array(z.string().max(500)).max(5).optional(),
+        thinkingConfig: z.object({includeThoughts: z.boolean().optional()}).optional()
       })
       .default({}),
   })
