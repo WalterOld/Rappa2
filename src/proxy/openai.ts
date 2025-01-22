@@ -112,8 +112,7 @@ const openaiResponseHandler: ProxyResHandlerWithBody = async (
   const interval = (req as any)._keepAliveInterval
   if (interval) {
     clearInterval(interval);
-    const responseJson = JSON.stringify(body);
-    res.write(responseJson.substring(1));
+    res.write(JSON.stringify(body));
     res.end();
     return;
   }
@@ -191,13 +190,11 @@ const setupChunkedTransfer: RequestHandler = (req, res, next) => {
       'Transfer-Encoding': 'chunked'
     });
     
-    res.write('{');
-    
     // Higher values are required - otherwise Cloudflare will buffer and not pass
     // the separate chunks, which means that a >100s response will get terminated anyway
     const keepAlive = setInterval(() => {
       res.write(' '.repeat(4096));
-    }, 49_000);
+    }, 48_000);
     
     (req as any)._keepAliveInterval = keepAlive;
   }
