@@ -290,3 +290,38 @@ infoPageRouter.get("/status", (req, res) => {
   res.json(buildInfo(req.protocol + "://" + req.get("host"), false));
 });
 export { infoPageRouter };
+
+const infoPageRouter = Router();
+if (config.serviceInfoPassword?.length) {
+  infoPageRouter.use(
+    express.json({ limit: "1mb" }),
+    express.urlencoded({ extended: true, limit: "1mb" })
+  );
+  infoPageRouter.use(withSession);
+  infoPageRouter.use(injectCsrfToken, checkCsrfToken);
+  infoPageRouter.post("/unlock-info", (req, res) => {
+    if (req.body.password !== config.serviceInfoPassword) {
+      return res.status(403).send("Incorrect password");
+    }
+    req.session!.unlocked = true;
+    res.redirect("/");
+  });
+  infoPageRouter.get("/unlock-info", (_req, res) => {
+    if (_req.session?.unlocked) return res.redirect("/");
+
+    res.send(`
+      <form method="post" action="/unlock-info">
+        <h1>Unlock Service Info</h1>
+        <input type="hidden" name="_csrf" value="${res.locals.csrfToken}" />
+        <input type="password" name="password" placeholder="Password" />
+        <button type="submit">Unlock</button>
+      </form>
+    `);
+  });
+  infoPageRouter.use(checkIfUnlocked);
+}
+infoPageRouter.get("/", handleInfoPage);
+infoPageRouter.get("/status", (req, res) => {
+  res.json(buildInfo(req.protocol + "://" + req.get("host"), false));
+});
+export { infoPageRouter };
