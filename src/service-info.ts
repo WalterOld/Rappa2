@@ -138,18 +138,21 @@ export type ServiceInfo = {
 // type ServiceInfoPath = `{${DeepKeyOf<ServiceInfo>}}`;
 
 const SERVICE_ENDPOINTS: { [s in LLMService]: Record<string, string> } = {
-  openai: {
-    openai: `%BASE%/openai`,
-    "openai-image": `%BASE%/openai-image`,
-  },
-  anthropic: {
-    anthropic: `%BASE%/anthropic`,
+  deepseek: {
+    deepseek: `%BASE%/deepseek`,
   },
   "google-ai": {
     "google-ai": `%BASE%/google-ai`,
   },
+  openai: {
+    openai: `%BASE%/openai`,
+    "openai-image": `%BASE%/openai-image`,
+  },
   "mistral-ai": {
     "mistral-ai": `%BASE%/mistral-ai`,
+  },
+  anthropic: {
+    anthropic: `%BASE%/anthropic`,
   },
   aws: {
     "aws-claude": `%BASE%/aws/claude`,
@@ -161,10 +164,7 @@ const SERVICE_ENDPOINTS: { [s in LLMService]: Record<string, string> } = {
   azure: {
     azure: `%BASE%/azure/openai`,
     "azure-image": `%BASE%/azure/openai`,
-  },
-  deepseek: {
-    deepseek: `%BASE%/deepseek`,
-  },
+  }
 };
 
 const familyStats = new Map<ModelAggregateKey, number>();
