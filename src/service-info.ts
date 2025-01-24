@@ -308,14 +308,14 @@ const addToFamily = increment.bind(null, familyStats);
 
 function addKeyToAggregates(k: KeyPoolKey) {
   addToService("proompts", k.promptCount);
-  addToService("openai__keys", k.service === "openai" ? 1 : 0);
-  addToService("anthropic__keys", k.service === "anthropic" ? 1 : 0);
+  addToService("deepseek__keys", k.service === "deepseek" ? 1 : 0);
   addToService("google-ai__keys", k.service === "google-ai" ? 1 : 0);
   addToService("mistral-ai__keys", k.service === "mistral-ai" ? 1 : 0);
+  addToService("openai__keys", k.service === "openai" ? 1 : 0);
+  addToService("anthropic__keys", k.service === "anthropic" ? 1 : 0);
   addToService("aws__keys", k.service === "aws" ? 1 : 0);
   addToService("gcp__keys", k.service === "gcp" ? 1 : 0);
   addToService("azure__keys", k.service === "azure" ? 1 : 0);
-  addToService("deepseek__keys", k.service === "deepseek" ? 1 : 0);
 
   let sumTokens = 0;
   let sumCost = 0;
@@ -330,6 +330,13 @@ function addKeyToAggregates(k: KeyPoolKey) {
   };
 
   switch (k.service) {
+    case "google-ai":
+    case "deepseek":
+      k.modelFamilies.forEach(incrementGenericFamilyStats);
+      break;
+    default:
+      assertNever(k.service);
+    case "mistral-ai":
     case "openai":
       if (!keyIsOpenAIKey(k)) throw new Error("Invalid key type");
       addToService("openai__uncheckedKeys", Boolean(k.lastChecked) ? 0 : 1);
@@ -381,13 +388,6 @@ function addKeyToAggregates(k: KeyPoolKey) {
       break;
     // These services don't have any additional stats to track.
     case "azure":
-    case "google-ai":
-    case "mistral-ai":
-    case "deepseek":
-      k.modelFamilies.forEach(incrementGenericFamilyStats);
-      break;
-    default:
-      assertNever(k.service);
   }
 
   addToService("tokens", sumTokens);
