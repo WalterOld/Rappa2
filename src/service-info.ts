@@ -330,6 +330,9 @@ function addKeyToAggregates(k: KeyPoolKey) {
   };
 
   switch (k.service) {
+    case "deepseek":
+    case "google-ai":
+    case "mistral-ai":
     case "openai":
       if (!keyIsOpenAIKey(k)) throw new Error("Invalid key type");
       addToService("openai__uncheckedKeys", Boolean(k.lastChecked) ? 0 : 1);
@@ -374,16 +377,13 @@ function addKeyToAggregates(k: KeyPoolKey) {
       addToFamily(`aws-claude__awsLogged`, countAsLogged ? 1 : 0);
       break;
     }
+    case "azure":
     case "gcp":
       if (!keyIsGcpKey(k)) throw new Error("Invalid key type");
       k.modelFamilies.forEach(incrementGenericFamilyStats);
       // TODO: add modelIds to GcpKey
       break;
     // These services don't have any additional stats to track.
-    case "azure":
-    case "google-ai":
-    case "mistral-ai":
-    case "deepseek":
       k.modelFamilies.forEach(incrementGenericFamilyStats);
       break;
     default:
